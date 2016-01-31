@@ -1,0 +1,7 @@
+##########################################################
+## Installation
+##########################################################
+
+sudo apt-get install jsvc
+
+- http://www.neilson.co.za/creating-a-java-daemon-system-service-for-debian-using-apache-commons-jsvc/
