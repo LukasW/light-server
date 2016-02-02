@@ -94,7 +94,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>ch.smaug.light.server.RestServer</mainClass>
+							<mainClass>ch.smaug.light.server.LightServerDaemon</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
