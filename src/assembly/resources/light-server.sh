@@ -32,7 +32,7 @@ CLASS_PATH="$FILE_PATH/$NAME.jar:/usr/share/java/commons-daemon.jar"
 CLASS="ch.smaug.light.server.LightServerDaemon"
 
 # Any command line arguments to be passed to the our Java Daemon implementations init() method
-ARGS="myArg1 myArg2 myArg3"
+ARGS=""
 
 #The user to run the daemon as
 USER="root"
@@ -49,7 +49,7 @@ LOG_ERR="$FILE_PATH/err/$NAME.err"
 jsvc_exec()
 {  
     cd $FILE_PATH
-    $EXEC -home $JAVA_HOME -server -cp $CLASS_PATH -user $USER -outfile $LOG_OUT -errfile $LOG_ERR -pidfile $PID $1 $CLASS $ARGS
+    sudo $EXEC -home $JAVA_HOME -cp $CLASS_PATH -outfile $LOG_OUT -errfile $LOG_ERR -pidfile $PID $1 $CLASS $ARGS
 }
 
 case "$1" in

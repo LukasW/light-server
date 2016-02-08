@@ -23,4 +23,8 @@ public class RestServer {
 	public void stop() {
 		httpServer.shutdown();
 	}
+
+	public static void main(final String[] args) {
+		new RestServer().start();
+	}
 }
