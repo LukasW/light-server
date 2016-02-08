@@ -3,8 +3,11 @@ package ch.smaug.light.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.pi4j.io.gpio.GpioController;
+import com.pi4j.io.gpio.GpioFactory;
+import com.pi4j.io.gpio.GpioPinPwmOutput;
+import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.wiringpi.Gpio;
-import com.pi4j.wiringpi.SoftPwm;
 
 public class LightControl {
 
@@ -13,15 +16,18 @@ public class LightControl {
 	private int value;
 	private final static LightControl INSTANCE = new LightControl();
 
-	private static final int PIN_NUMBER = 1;
+	private final GpioPinPwmOutput out;
 
 	public static LightControl getLightControl() {
 		return INSTANCE;
 	}
 
 	private LightControl() {
-		Gpio.wiringPiSetup();
-		SoftPwm.softPwmCreate(PIN_NUMBER, 0, 100);
+		final GpioController gpio = GpioFactory.getInstance();
+		out = gpio.provisionPwmOutputPin(RaspiPin.GPIO_01);
+		Gpio.pwmSetMode(Gpio.PWM_MODE_BAL);
+		Gpio.pwmSetRange(100);
+		Gpio.pwmSetClock(10);
 	}
 
 	public int getValue() {
@@ -34,6 +40,6 @@ public class LightControl {
 		}
 		LOG.info("Set value from {} to {}.", this.value, value);
 		this.value = value;
-		SoftPwm.softPwmWrite(PIN_NUMBER, value);
+		out.setPwm(value);
 	}
 }
