@@ -9,16 +9,17 @@
 	</formats>
 	<includeBaseDirectory>false</includeBaseDirectory>
 
-	<files>
-		<file>
-			<source>${project.build.directory}/${artifactId}-${version}.jar</source>
-			<outputDirectory>/</outputDirectory>
-			<destName>${artifactId}.jar</destName>
-		</file>
-		<file>
-			<source>${basedir}/src/assembly/resources/light-server.sh</source>
-			<outputDirectory>/</outputDirectory>
+	<fileSets>
+		<fileSet>
+			<directory>${basedir}/src/assembly/resources/bin</directory>
+			<outputDirectory>bin</outputDirectory>
 			<fileMode>0755</fileMode>
-		</file>
-	</files>
+		</fileSet>
+	</fileSets>
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>/lib</outputDirectory>
+			<unpack>false</unpack>
+		</dependencySet>
+	</dependencySets>
 </assembly>

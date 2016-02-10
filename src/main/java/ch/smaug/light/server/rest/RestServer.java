@@ -1,4 +1,4 @@
-package ch.smaug.light.server;
+package ch.smaug.light.server.rest;
 
 import java.net.URI;
 
@@ -9,22 +9,18 @@ import org.glassfish.jersey.server.ResourceConfig;
 /**
  * RestServer class.
  */
-public class RestServer {
+public final class RestServer {
 
 	private static final String BASE_URI = "http://0.0.0.0:8080/light/";
 
 	private HttpServer httpServer;
 
 	public void start() {
-		final ResourceConfig rc = new ResourceConfig().packages(LightRestService.class.getPackage().toString());
+		final ResourceConfig rc = new ResourceConfig().packages(VersionRestService.class.getPackage().toString());
 		httpServer = GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
 	}
 
 	public void stop() {
 		httpServer.shutdown();
-	}
-
-	public static void main(final String[] args) {
-		new RestServer().start();
 	}
 }

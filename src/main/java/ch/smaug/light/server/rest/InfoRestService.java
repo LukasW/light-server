@@ -1,4 +1,4 @@
-package ch.smaug.light.server;
+package ch.smaug.light.server.rest;
 
 import java.io.IOException;
 import java.io.PrintWriter;

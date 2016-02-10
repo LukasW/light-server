@@ -1,4 +1,9 @@
-package ch.smaug.light.server;
+package ch.smaug.light.server.control;
+
+import javax.enterprise.inject.Default;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,20 +18,23 @@ import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import com.pi4j.wiringpi.Gpio;
 
+import ch.smaug.light.server.rest.LightRestService;
+
+@Singleton
+@Named
+@Default
 public class LightControl {
 
 	private final static Logger LOG = LoggerFactory.getLogger(LightRestService.class);
 
 	private int value;
-	private final static LightControl INSTANCE = new LightControl();
 
 	private final GpioPinPwmOutput out;
 
 	private final GpioPinDigitalInput myButton;
 
-	public static LightControl getLightControl() {
-		return INSTANCE;
-	}
+	@Inject
+	private Linearizer linearizer;
 
 	private LightControl() {
 		final GpioController gpio = GpioFactory.getInstance();
@@ -59,5 +67,29 @@ public class LightControl {
 		LOG.info("Set value from {} to {}.", this.value, value);
 		this.value = value;
 		out.setPwm(value);
+	}
+
+	public void fade() {
+		new Thread() {
+
+			@Override
+			public void run() {
+
+				try {
+					for (int j = 0; j < 10; j++) {
+						for (int i = 0; i < linearizer.getNumberOfLevels(); i++) {
+							out.setPwm(linearizer.getValue(i));
+							Thread.sleep(30);
+						}
+						for (int i = linearizer.getNumberOfLevels() - 2; i > 0; i--) {
+							out.setPwm(linearizer.getValue(i));
+							Thread.sleep(30);
+						}
+					}
+				} catch (final InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
 	}
 }

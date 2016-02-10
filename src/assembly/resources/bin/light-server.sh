@@ -19,17 +19,17 @@ DESC="light-server service"
 # The path to Jsvc
 EXEC="/usr/bin/jsvc"
 
-# The path to the folder containing MyDaemon.jar
+# The path to the folder containing the daemon
 FILE_PATH="/opt/$NAME"
 
 # The path to the folder containing the java runtime
 JAVA_HOME="/usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt"
 
 # Our classpath including our jar file and the Apache Commons Daemon library
-CLASS_PATH="$FILE_PATH/$NAME.jar:/usr/share/java/commons-daemon.jar"
+CLASS_PATH="$FILE_PATH/lib/*:/usr/share/java/commons-daemon.jar"
 
 # The fully qualified name of the class to execute
-CLASS="ch.smaug.light.server.LightServerDaemon"
+CLASS="ch.smaug.light.server.daemon.LightServerDaemon"
 
 # Any command line arguments to be passed to the our Java Daemon implementations init() method
 ARGS=""
