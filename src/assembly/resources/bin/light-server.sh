@@ -23,7 +23,7 @@ EXEC="/usr/bin/jsvc"
 FILE_PATH="/opt/$NAME"
 
 # The path to the folder containing the java runtime
-JAVA_HOME="/usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt"
+JAVA_HOME="/usr/lib/jvm/jdk-8-oracle-arm32-vfp-hflt"
 
 # Our classpath including our jar file and the Apache Commons Daemon library
 CLASS_PATH="$FILE_PATH/lib/*:/usr/share/java/commons-daemon.jar"

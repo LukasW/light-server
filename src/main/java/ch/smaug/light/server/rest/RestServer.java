@@ -16,7 +16,7 @@ public final class RestServer {
 	private HttpServer httpServer;
 
 	public void start() {
-		final ResourceConfig rc = new ResourceConfig().packages(VersionRestService.class.getPackage().toString());
+		final ResourceConfig rc = new ResourceConfig().packages(InfoRestService.class.getPackage().toString());
 		httpServer = GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
 	}
 

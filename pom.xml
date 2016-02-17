@@ -9,7 +9,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 
 	<properties>
-		<jersey.version>2.22.1</jersey.version>
+		<jersey.version>2.22.2</jersey.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -34,6 +34,10 @@
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-moxy</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.ext.cdi</groupId>
+			<artifactId>jersey-weld2-se</artifactId>
 		</dependency>
 
 		<!-- Raspberry GPIO -->
@@ -65,8 +69,14 @@
 
 		<!-- CDI -->
 		<dependency>
-			<groupId>org.glassfish.jersey.ext.cdi</groupId>
-			<artifactId>jersey-weld2-se</artifactId>
+			<groupId>javax.enterprise</groupId>
+			<artifactId>cdi-api</artifactId>
+			<version>1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.weld.se</groupId>
+			<artifactId>weld-se-core</artifactId>
+			<version>2.3.2.Final</version>
 		</dependency>
 
 		<!-- Testing -->
@@ -74,6 +84,13 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.9</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jglue.cdi-unit</groupId>
+			<artifactId>cdi-unit</artifactId>
+			<version>3.1.2</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -99,7 +116,6 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -159,7 +175,7 @@
 							<url>scp://192.168.1.203/home/pi</url>
 							<commands>
 								<command>sudo service light-server stop</command>
-								<command>sudo tar --overwrite --no-same-owner -xzf ${project.artifactId}.tar.gz -C /opt/light-server</command>
+								<command><![CDATA[sudo tar --overwrite --no-same-owner -xzf ${project.artifactId}.tar.gz -C /opt/light-server]]></command>
 								<command>rm ${project.artifactId}.tar.gz</command>
 								<command>sudo systemctl daemon-reload</command>
 								<command>sudo service light-server start</command>

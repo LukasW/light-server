@@ -3,12 +3,14 @@ package ch.smaug.light.server.control;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 
 /**
  * Linearized pwm steps.
  */
 @Named
+@ApplicationScoped
 public class Linearizer {
 
 	private final static List<Integer> PWM_LEVELS = Arrays.asList(0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5,
