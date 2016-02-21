@@ -15,6 +15,8 @@ import com.pi4j.wiringpi.Gpio;
 @ApplicationScoped
 public class RaspberryPiGatewayImpl implements RaspberryPiGateway {
 
+	private static final int PWM_RANGE = 1000;
+
 	private final GpioPinPwmOutput pwmOutput;
 
 	private final GpioPinDigitalInput myButton;
@@ -25,7 +27,7 @@ public class RaspberryPiGatewayImpl implements RaspberryPiGateway {
 		gpioController = GpioFactory.getInstance();
 		pwmOutput = gpioController.provisionPwmOutputPin(RaspiPin.GPIO_01);
 		Gpio.pwmSetMode(Gpio.PWM_MODE_BAL);
-		Gpio.pwmSetRange(1000);
+		Gpio.pwmSetRange(PWM_RANGE);
 		Gpio.pwmSetClock(100);
 
 		myButton = gpioController.provisionDigitalInputPin(RaspiPin.GPIO_29, PinPullResistance.PULL_UP);
@@ -39,6 +41,9 @@ public class RaspberryPiGatewayImpl implements RaspberryPiGateway {
 
 	@Override
 	public void setPwm(final int value) {
+		if (value < 0 || value > PWM_RANGE) {
+			throw new IllegalArgumentException(String.format("value must be in in [0..%d]", PWM_RANGE));
+		}
 		pwmOutput.setPwm(value);
 	}
 }

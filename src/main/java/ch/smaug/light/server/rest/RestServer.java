@@ -11,7 +11,7 @@ import org.glassfish.jersey.server.ResourceConfig;
  */
 public final class RestServer {
 
-	private static final String BASE_URI = "http://0.0.0.0:8080/light/";
+	private static final String BASE_URI = "http://0.0.0.0:8080/light/api";
 
 	private HttpServer httpServer;
 
