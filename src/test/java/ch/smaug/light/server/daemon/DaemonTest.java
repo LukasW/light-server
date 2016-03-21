@@ -7,13 +7,14 @@ import org.jglue.cdiunit.CdiRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import ch.smaug.light.server.control.FadingLightControl;
+import ch.smaug.light.server.control.fading.FadingLightControl;
 import ch.smaug.light.server.pi.RaspberryPiGatewayMock;
 
 @RunWith(CdiRunner.class)
 @ActivatedAlternatives(RaspberryPiGatewayMock.class)
 public class DaemonTest {
 
+	@SuppressWarnings("unused")
 	@Inject
 	private FadingLightControl lightControl;
 

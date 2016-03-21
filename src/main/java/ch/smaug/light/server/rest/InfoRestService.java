@@ -35,7 +35,7 @@ public class InfoRestService {
 			infoWriter.println("Processor         :  " + SystemInfo.getProcessor());
 			infoWriter.println("Hardware Revision :  " + SystemInfo.getRevision());
 			infoWriter.println("Is Hard Float ABI :  " + SystemInfo.isHardFloatAbi());
-			infoWriter.println("Board Type        :  " + SystemInfo.getBoardType().name());
+			infoWriter.println("Board ClickType        :  " + SystemInfo.getBoardType().name());
 
 			infoWriter.println("----------------------------------------------------");
 			infoWriter.println("MEMORY INFO");

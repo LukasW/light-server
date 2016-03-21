@@ -1,4 +1,4 @@
-package ch.smaug.light.server.control;
+package ch.smaug.light.server.control.common;
 
 public interface LightControl {
 

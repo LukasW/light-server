@@ -1,9 +1,10 @@
-package ch.smaug.light.server.control;
+package ch.smaug.light.server.control.linearizing;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import ch.smaug.light.server.control.common.LightControl;
 import ch.smaug.light.server.pi.RaspberryPiGateway;
 
 @Named

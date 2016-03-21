@@ -7,7 +7,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import ch.smaug.light.server.control.FadingLightControl;
+import ch.smaug.light.server.control.fading.FadingLightControl;
 
 @Path("control")
 public class LightControlRestService {

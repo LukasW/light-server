@@ -1,8 +1,11 @@
-package ch.smaug.light.server.control;
+package ch.smaug.light.server.control.fading;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import ch.smaug.light.server.control.common.LightControl;
+import ch.smaug.light.server.control.linearizing.LinearizedLightControl;
 
 @Named
 @ApplicationScoped
@@ -31,6 +34,10 @@ public class FadingLightControl implements LightControl {
 	@Override
 	public void setLevel(final int level) {
 		fadingThread.setExpectedLevel(level);
+	}
+
+	public int getCurrentLevel() {
+		return 3;
 	}
 
 }

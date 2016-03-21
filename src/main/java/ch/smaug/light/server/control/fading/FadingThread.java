@@ -1,4 +1,4 @@
-package ch.smaug.light.server.control;
+package ch.smaug.light.server.control.fading;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
