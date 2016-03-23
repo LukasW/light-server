@@ -14,6 +14,9 @@ import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import com.pi4j.wiringpi.Gpio;
 
+import ch.smaug.light.server.pi.KeyButtonEvent.Key;
+import ch.smaug.light.server.pi.KeyButtonEvent.Edge;
+
 @ApplicationScoped
 public class RaspberryPiGatewayImpl implements RaspberryPiGateway {
 
@@ -26,7 +29,7 @@ public class RaspberryPiGatewayImpl implements RaspberryPiGateway {
 	private final GpioController gpioController;
 
 	@Inject
-	private Event<GpioPinDigitalStateChangeEvent> gpioPinDigitalStateChangeEvent;
+	private Event<KeyButtonEvent> keyButtonEvent;
 
 	RaspberryPiGatewayImpl() {
 		gpioController = GpioFactory.getInstance();
@@ -39,9 +42,8 @@ public class RaspberryPiGatewayImpl implements RaspberryPiGateway {
 		myButton.addListener(new GpioPinListenerDigital() {
 			@Override
 			public void handleGpioPinDigitalStateChangeEvent(final GpioPinDigitalStateChangeEvent event) {
-				gpioPinDigitalStateChangeEvent.fire(event);
+				keyButtonEvent.fire(new KeyButtonEvent(Key.Key1, event.getState().isHigh() ? Edge.Positive : Edge.Negative));
 			}
-
 		});
 	}
 

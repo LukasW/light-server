@@ -1,8 +1,5 @@
 package ch.smaug.light.server.control.master;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
 import javax.enterprise.inject.Produces;
@@ -13,57 +10,32 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 
-import ch.smaug.light.server.control.fading.FadingLightControl;
+import ch.smaug.light.server.control.linearizing.LinearizedLightControl;
+import ch.smaug.light.server.control.master.LightStateEvent.Type;
 
 @RunWith(CdiRunner.class)
 public class MasterLightControlTest {
 
 	@Mock
 	@Produces
-	private FadingLightControl fadingLightControlMock;
+	private LinearizedLightControl lightControl;
 
 	@Inject
 	private MasterLightControl testee;
 
 	@Test
-	public void turnOff_setLevelToZero() {
-		// Arrange
+	public void turnOn_setLevelTo100Percent() {
 		// Act
-		testee.turnOff();
+		testee.consume(new LightStateEvent(Type.TurnOn));
 		// Assert
-		verify(fadingLightControlMock).setLevel(0);
+		verify(lightControl).setLevel(100);
 	}
 
 	@Test
-	public void turnOn_setLevelToLastLevel() {
-		// Arrange
-		testee.setLevel(70);
-		testee.turnOff();
-		reset(fadingLightControlMock);
+	public void turnOn_setLevelTo0Percent() {
 		// Act
-		testee.turnOn();
+		testee.consume(new LightStateEvent(Type.TurnOff));
 		// Assert
-		verify(fadingLightControlMock).setLevel(70);
+		verify(lightControl).setLevel(0);
 	}
-
-	@Test
-	public void isOn_levelMoreThenZero_true() {
-		// Arrange
-		testee.setLevel(70);
-		// Act
-		final boolean on = testee.isOn();
-		// Assert
-		assertThat(on, is(true));
-	}
-
-	@Test
-	public void isOn_levelMoreIsZero_false() {
-		// Arrange
-		testee.setLevel(0);
-		// Act
-		final boolean on = testee.isOn();
-		// Assert
-		assertThat(on, is(false));
-	}
-
 }

@@ -35,9 +35,4 @@ public class FadingLightControl implements LightControl {
 	public void setLevel(final int level) {
 		fadingThread.setExpectedLevel(level);
 	}
-
-	public int getCurrentLevel() {
-		return 3;
-	}
-
 }

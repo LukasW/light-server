@@ -1,43 +1,36 @@
 package ch.smaug.light.server.control.master;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import ch.smaug.light.server.control.common.LightControl;
-import ch.smaug.light.server.control.fading.FadingLightControl;
+import ch.smaug.light.server.control.linearizing.LinearizedLightControl;
 
 @ApplicationScoped
-public class MasterLightControl implements LightControl {
+public class MasterLightControl {
+
+	private static final int TURN_ON_PERCENTAGE = 100;
+	private static final int TURN_OFF_PERCENTAGE = 0;
 
 	@Inject
-	private FadingLightControl fadingLightControl;
+	private LinearizedLightControl lightControl;
 
-	private int level;
-
-	@Override
-	public int getNumberOfLevels() {
-		return fadingLightControl.getNumberOfLevels();
+	private void turnOn() {
+		lightControl.setLevel(TURN_ON_PERCENTAGE);
 	}
 
-	public void turnOn() {
-		fadingLightControl.setLevel(level);
+	private void turnOff() {
+		lightControl.setLevel(TURN_OFF_PERCENTAGE);
 	}
 
-	public void turnOff() {
-		fadingLightControl.setLevel(0);
-	}
-
-	@Override
-	public void setLevel(final int level) {
-		this.level = level;
-		fadingLightControl.setLevel(level);
-	}
-
-	public int getCurrentLevel() {
-		return level;
-	}
-
-	public boolean isOn() {
-		return level > 0;
+	public void consume(@Observes final LightStateEvent lightStateEvent) {
+		switch (lightStateEvent.getType()) {
+		case TurnOff:
+			turnOff();
+			break;
+		case TurnOn:
+			turnOn();
+			break;
+		}
 	}
 }

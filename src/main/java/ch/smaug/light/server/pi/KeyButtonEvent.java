@@ -1,18 +1,28 @@
 package ch.smaug.light.server.pi;
 
-public class KeyButtonEvent {
+public final class KeyButtonEvent {
 
-	private final ClickType type;
+	private final Key key;
+	private final Edge slope;
 
-	public enum ClickType {
-		Short, Long
+	public enum Edge {
+		Positive, Negative
 	}
 
-	public KeyButtonEvent(final ClickType type) {
-		this.type = type;
+	public enum Key {
+		Key1, Key2
 	}
 
-	public ClickType getType() {
-		return type;
+	public KeyButtonEvent(final Key key, final Edge slope) {
+		this.key = key;
+		this.slope = slope;
+	}
+
+	public Key getKey() {
+		return key;
+	}
+
+	public Edge getSlope() {
+		return slope;
 	}
 }
