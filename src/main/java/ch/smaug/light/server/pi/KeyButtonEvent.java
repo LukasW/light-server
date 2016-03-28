@@ -3,7 +3,20 @@ package ch.smaug.light.server.pi;
 public final class KeyButtonEvent {
 
 	private final Key key;
-	private final Edge slope;
+	private final Edge edge;
+
+	public KeyButtonEvent(final Key key, final Edge edge) {
+		this.key = key;
+		this.edge = edge;
+	}
+
+	public Key getKey() {
+		return key;
+	}
+
+	public Edge getEdge() {
+		return edge;
+	}
 
 	public enum Edge {
 		Positive, Negative
@@ -13,16 +26,4 @@ public final class KeyButtonEvent {
 		Key1, Key2
 	}
 
-	public KeyButtonEvent(final Key key, final Edge slope) {
-		this.key = key;
-		this.slope = slope;
-	}
-
-	public Key getKey() {
-		return key;
-	}
-
-	public Edge getSlope() {
-		return slope;
-	}
 }

@@ -11,7 +11,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 
 import ch.smaug.light.server.control.linearizing.LinearizedLightControl;
-import ch.smaug.light.server.control.master.LightStateEvent.Type;
+import ch.smaug.light.server.control.master.fsm.LightStateOutputEvent;
+import ch.smaug.light.server.control.master.fsm.LightStateOutputEvent.Type;
 
 @RunWith(CdiRunner.class)
 public class MasterLightControlTest {
@@ -26,7 +27,7 @@ public class MasterLightControlTest {
 	@Test
 	public void turnOn_setLevelTo100Percent() {
 		// Act
-		testee.consume(new LightStateEvent(Type.TurnOn));
+		testee.consume(new LightStateOutputEvent(Type.TurnOn));
 		// Assert
 		verify(lightControl).setLevel(100);
 	}
@@ -34,7 +35,7 @@ public class MasterLightControlTest {
 	@Test
 	public void turnOn_setLevelTo0Percent() {
 		// Act
-		testee.consume(new LightStateEvent(Type.TurnOff));
+		testee.consume(new LightStateOutputEvent(Type.TurnOff));
 		// Assert
 		verify(lightControl).setLevel(0);
 	}
