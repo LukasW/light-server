@@ -1,8 +1,7 @@
 package ch.smaug.light.server;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 
@@ -14,6 +13,8 @@ import org.jglue.cdiunit.AdditionalClasspaths;
 import org.jglue.cdiunit.CdiRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.smaug.light.server.control.master.MasterLightControl;
 import ch.smaug.light.server.pi.KeyButtonEvent;
@@ -26,6 +27,7 @@ import ch.smaug.light.server.pi.RaspberryPiGatewayMock;
 @ActivatedAlternatives(RaspberryPiGatewayMock.class)
 public class LightServerAcceptanceTest {
 
+	private static final Logger LOG = LoggerFactory.getLogger(LightServerAcceptanceTest.class);
 	@Inject
 	private Event<KeyButtonEvent> keyButtonEvent;
 
@@ -33,16 +35,19 @@ public class LightServerAcceptanceTest {
 	private RaspberryPiGatewayMock raspberryPiGatewayMock;
 
 	@Test
-	public void shortButtonPressing_lightIsOff_turnLightOn() {
+	public void turnLightOn() {
+		LOG.info("*** Start test turnLightOn");
 		// act
 		fireShortClick();
 		final int pwmValue = raspberryPiGatewayMock.getPwm();
 		// assert
 		assertThat(pwmValue, is(1000));
+		LOG.info("*** End test turnLightOn");
 	}
 
 	@Test
-	public void shortButtonPressing_lightIsOn_turnLightOff() {
+	public void turnLightOff() {
+		LOG.info("*** Start test turnLightOff");
 		// arrange
 		fireShortClick();
 		assumeThat(raspberryPiGatewayMock.getPwm(), is(1000));
@@ -51,17 +56,44 @@ public class LightServerAcceptanceTest {
 		final int pwmValue = raspberryPiGatewayMock.getPwm();
 		// assert
 		assertThat(pwmValue, is(0));
+		LOG.info("*** End test turnLightOff");
 	}
 
 	@Test
-	public void longButtonPressing_lightIsOff_turnLightOnAndDecrease() {
+	public void turnLightOnAndOneStepDimDown() {
+		LOG.info("*** Start test turnLightOnAndOneStepDimDown");
 		// arrange
 		// act
-		fireLongClick(1000);
+		fireLongClick(75);
 		final int pwmValue = raspberryPiGatewayMock.getPwm();
 		// assert
-		assertThat(pwmValue, is((greaterThan(0))));
-		assertThat(pwmValue, is(lessThan(1000)));
+		assertThat(pwmValue, is(equalTo(933)));
+		LOG.info("*** *** End test turnLightOnAndOneStepDimDown");
+	}
+
+	@Test
+	public void turnLightOnAndTwoStepsDimDown() {
+		LOG.info("*** Start test turnLightOnAndTwoStepsDimDown");
+		// arrange
+		// act
+		fireLongClick(125);
+		final int pwmValue = raspberryPiGatewayMock.getPwm();
+		// assert
+		assertThat(pwmValue, is(equalTo(871)));
+		LOG.info("*** End test turnLightOnAndTwoStepsDimDown");
+	}
+
+	@Test
+	public void dimOneStepUp() {
+		LOG.info("*** Start test dimOneStepUp");
+		// arrange
+		fireLongClick(125);
+		// act
+		fireLongClick(75);
+		final int pwmValue = raspberryPiGatewayMock.getPwm();
+		// assert
+		assertThat(pwmValue, is(equalTo(933)));
+		LOG.info("*** End test dimOneStepUp");
 	}
 
 	private void fireShortClick() {
@@ -72,7 +104,7 @@ public class LightServerAcceptanceTest {
 	private void fireLongClick(final long duration) {
 		keyButtonEvent.fire(new KeyButtonEvent(Key.Key1, Edge.Positive));
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(duration);
 		} catch (final InterruptedException e) {
 			throw new RuntimeException(e);
 		}

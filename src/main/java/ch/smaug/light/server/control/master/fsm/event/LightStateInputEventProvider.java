@@ -1,10 +1,9 @@
-package ch.smaug.light.server.control.master.fsm;
+package ch.smaug.light.server.control.master.fsm.event;
 
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import ch.smaug.light.server.control.master.fsm.LightStateInputEvent.InputEventType;
 import ch.smaug.light.server.pi.KeyButtonEvent;
 
 public class LightStateInputEventProvider {
@@ -20,10 +19,10 @@ public class LightStateInputEventProvider {
 		LightStateInputEvent result;
 		switch (keyButtonEvent.getEdge()) {
 		case Negative:
-			result = new LightStateInputEvent(InputEventType.NegativeEdge);
+			result = LightStateInputEvent.NegativeEdge;
 			break;
 		case Positive:
-			result = new LightStateInputEvent(InputEventType.PositiveEdge);
+			result = LightStateInputEvent.PositiveEdge;
 			break;
 		default:
 			throw new IllegalArgumentException("Unknown type of event: " + keyButtonEvent);

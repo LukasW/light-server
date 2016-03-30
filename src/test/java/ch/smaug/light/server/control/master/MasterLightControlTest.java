@@ -11,8 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 
 import ch.smaug.light.server.control.linearizing.LinearizedLightControl;
-import ch.smaug.light.server.control.master.fsm.LightStateOutputEvent;
-import ch.smaug.light.server.control.master.fsm.LightStateOutputEvent.Type;
+import ch.smaug.light.server.control.master.fsm.event.LightStateOutputEvent;
 
 @RunWith(CdiRunner.class)
 public class MasterLightControlTest {
@@ -27,7 +26,7 @@ public class MasterLightControlTest {
 	@Test
 	public void turnOn_setLevelTo100Percent() {
 		// Act
-		testee.consume(new LightStateOutputEvent(Type.TurnOn));
+		testee.consume(LightStateOutputEvent.TurnOn);
 		// Assert
 		verify(lightControl).setLevel(100);
 	}
@@ -35,7 +34,45 @@ public class MasterLightControlTest {
 	@Test
 	public void turnOn_setLevelTo0Percent() {
 		// Act
-		testee.consume(new LightStateOutputEvent(Type.TurnOff));
+		testee.consume(LightStateOutputEvent.TurnOff);
+		// Assert
+		verify(lightControl).setLevel(0);
+	}
+
+	@Test
+	public void dimDown_fullLight_decreaseLevel() {
+		// Arrange
+		testee.consume(LightStateOutputEvent.TurnOn);
+		// Act
+		testee.consume(LightStateOutputEvent.DimDown);
+		// Assert
+		verify(lightControl).setLevel(99);
+	}
+
+	@Test
+	public void dimDown_noLight_setLevelToMaximum() {
+		// Arrange
+		// Act
+		testee.consume(LightStateOutputEvent.DimDown);
+		// Assert
+		verify(lightControl).setLevel(100);
+	}
+
+	@Test
+	public void dimUp_noLight_increaseLevel() {
+		// Arrange
+		// Act
+		testee.consume(LightStateOutputEvent.DimUp);
+		// Assert
+		verify(lightControl).setLevel(1);
+	}
+
+	@Test
+	public void dimUp_fullLight_setLevelToMaximum() {
+		// Arrange
+		testee.consume(LightStateOutputEvent.TurnOn);
+		// Act
+		testee.consume(LightStateOutputEvent.DimUp);
 		// Assert
 		verify(lightControl).setLevel(0);
 	}

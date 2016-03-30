@@ -10,29 +10,33 @@ import ch.smaug.light.server.control.master.fsm.event.LightStateInputEvent;
 import ch.smaug.light.server.control.master.fsm.event.LightStateOutputEvent;
 
 @ApplicationScoped
-public class OffState implements State {
+public class DimUpState implements State {
 
 	@Inject
-	private DeferredEvent<LightStateInputEvent> delayLightStateInputEventSender;
+	private DeferredEvent<LightStateInputEvent> delayedLightStateInputEventSender;
 
 	@Inject
-	private StartingState startingState;
+	private OnState onState;
 
 	@Inject
 	private Event<LightStateOutputEvent> lightStateOutputEvent;
 
 	@Inject
-	@ConfigValue("startingTimeout")
-	private Long startingTimeout;
+	@ConfigValue("repeatingTimeout")
+	private Long repeatingTimeout;
 
 	@Override
 	public State process(final LightStateInputEvent event) {
 		State nextState;
 		switch (event) {
-		case PositiveEdge:
-			lightStateOutputEvent.fire(LightStateOutputEvent.TurnOn);
-			delayLightStateInputEventSender.sendDeferred(startingTimeout, LightStateInputEvent.Timeout);
-			nextState = startingState;
+		case NegativeEdge:
+			delayedLightStateInputEventSender.cancelAll();
+			nextState = onState;
+			break;
+		case Timeout:
+			lightStateOutputEvent.fire(LightStateOutputEvent.DimUp);
+			delayedLightStateInputEventSender.sendDeferred(repeatingTimeout, LightStateInputEvent.Timeout);
+			nextState = this;
 			break;
 		default:
 			logUnexpectedEvent(event);
@@ -40,4 +44,5 @@ public class OffState implements State {
 		}
 		return nextState;
 	}
+
 }

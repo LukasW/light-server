@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.smaug.light.server.control.linearizing.LinearizedLightControl;
-import ch.smaug.light.server.control.master.fsm.LightStateOutputEvent;
+import ch.smaug.light.server.control.master.fsm.event.LightStateOutputEvent;
 
 @ApplicationScoped
 public class MasterLightControl {
@@ -21,30 +21,47 @@ public class MasterLightControl {
 	@Inject
 	private LinearizedLightControl lightControl;
 
+	private int lightPercentage = 0;
+
 	public void consume(@Observes final LightStateOutputEvent lightStateEvent) {
 		LOG.debug("Got event: {}", lightStateEvent);
-		switch (lightStateEvent.getType()) {
+		switch (lightStateEvent) {
 		case TurnOff:
 			turnOff();
 			break;
 		case TurnOn:
 			turnOn();
 			break;
-		case Previous:
-			previous();
+		case DimDown:
+			dimDown();
+			break;
+		case DimUp:
+			dimUp();
 			break;
 		}
 	}
 
 	private void turnOn() {
-		lightControl.setLevel(TURN_ON_PERCENTAGE);
+		lightPercentage = TURN_ON_PERCENTAGE;
+		writePercentage();
 	}
 
 	private void turnOff() {
-		lightControl.setLevel(TURN_OFF_PERCENTAGE);
+		lightPercentage = TURN_OFF_PERCENTAGE;
+		writePercentage();
 	}
 
-	private void previous() {
-		lightControl.setLevel(80);
+	private void dimUp() {
+		lightPercentage = (lightPercentage + 1) % 101;
+		writePercentage();
+	}
+
+	private void dimDown() {
+		lightPercentage = (lightPercentage + 100) % 101;
+		writePercentage();
+	}
+
+	private void writePercentage() {
+		lightControl.setLevel(lightPercentage);
 	}
 }

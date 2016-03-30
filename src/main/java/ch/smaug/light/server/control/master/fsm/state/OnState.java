@@ -1,24 +1,37 @@
 package ch.smaug.light.server.control.master.fsm.state;
 
-import javax.enterprise.event.Event;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import ch.smaug.light.server.control.master.fsm.LightStateInputEvent;
-import ch.smaug.light.server.control.master.fsm.LightStateOutputEvent;
-import ch.smaug.light.server.control.master.fsm.LightStateOutputEvent.Type;
+import ch.smaug.light.server.cdi.ConfigValue;
+import ch.smaug.light.server.cdi.DeferredEvent;
+import ch.smaug.light.server.control.master.fsm.event.LightStateInputEvent;
 
+@ApplicationScoped
 public class OnState implements State {
 
 	@Inject
-	private Event<LightStateOutputEvent> lightStateOutputEvent;
+	private DeferredEvent<LightStateInputEvent> delayLightStateInputEventSender;
 
 	@Inject
-	private OffState offState;
+	private PressedState pressedState;
+
+	@Inject
+	@ConfigValue("startingTimeout")
+	private Long startingTimeout;
 
 	@Override
 	public State process(final LightStateInputEvent event) {
-		lightStateOutputEvent.fire(new LightStateOutputEvent(Type.TurnOff));
-		return offState;
+		State nextState;
+		switch (event) {
+		case PositiveEdge:
+			delayLightStateInputEventSender.sendDeferred(startingTimeout, LightStateInputEvent.Timeout);
+			nextState = pressedState;
+			break;
+		default:
+			logUnexpectedEvent(event);
+			nextState = this;
+		}
+		return nextState;
 	}
-
 }

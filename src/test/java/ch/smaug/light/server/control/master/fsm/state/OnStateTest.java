@@ -5,7 +5,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 
-import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
@@ -18,41 +17,32 @@ import org.mockito.Mock;
 import ch.smaug.light.server.cdi.DeferredEvent;
 import ch.smaug.light.server.cdi.TestConfigValueProducer;
 import ch.smaug.light.server.control.master.fsm.event.LightStateInputEvent;
-import ch.smaug.light.server.control.master.fsm.event.LightStateOutputEvent;
 
 @RunWith(CdiRunner.class)
 @ActivatedAlternatives(TestConfigValueProducer.class)
-public class OffStateTest {
+public class OnStateTest {
 
 	@Inject
 	private TestConfigValueProducer testConfigValueProducer;
 
 	@Inject
-	private OffState testee;
+	private OnState testee;
 
 	@Inject
-	private StartingState startingState;
+	private PressedState pressedState;
 
 	@Mock
 	@Produces
 	private DeferredEvent<LightStateInputEvent> delayedLightStateInputEventSender;
 
-	private LightStateOutputEvent lastLightStateOutputEvent;
-
 	@Test
-	public void processEvent_positiveEdge() {
+	public void processEvent_positiveEvent() {
 		// arrange
-		testConfigValueProducer.setConfigValue("startingTimeout", 7L);
+		testConfigValueProducer.setConfigValue("startingTimeout", 19L);
 		// act
 		final State nextState = testee.process(LightStateInputEvent.PositiveEdge);
 		// assert
-		verify(delayedLightStateInputEventSender).sendDeferred(7, LightStateInputEvent.Timeout);
-		assertThat(nextState, is(equalTo(startingState)));
-		assertThat(lastLightStateOutputEvent, is(equalTo(LightStateOutputEvent.TurnOn)));
+		verify(delayedLightStateInputEventSender).sendDeferred(19, LightStateInputEvent.Timeout);
+		assertThat(nextState, is(equalTo(pressedState)));
 	}
-
-	public void processLightStateOutputEvent(@Observes final LightStateOutputEvent lightStateOutputEvent) {
-		this.lastLightStateOutputEvent = lightStateOutputEvent;
-	}
-
 }

@@ -4,17 +4,16 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
-import ch.smaug.light.server.control.master.fsm.DelayedEvent;
-import ch.smaug.light.server.control.master.fsm.LightStateInputEvent;
-import ch.smaug.light.server.control.master.fsm.LightStateInputEvent.InputEventType;
-import ch.smaug.light.server.control.master.fsm.LightStateOutputEvent;
-import ch.smaug.light.server.control.master.fsm.LightStateOutputEvent.Type;
+import ch.smaug.light.server.cdi.ConfigValue;
+import ch.smaug.light.server.cdi.DeferredEvent;
+import ch.smaug.light.server.control.master.fsm.event.LightStateInputEvent;
+import ch.smaug.light.server.control.master.fsm.event.LightStateOutputEvent;
 
 @ApplicationScoped
 public class StartingState implements State {
 
 	@Inject
-	private DelayedEvent<LightStateInputEvent> delayLightStateInputEventSender;
+	private DeferredEvent<LightStateInputEvent> delayedLightStateInputEventSender;
 
 	@Inject
 	private DimDownState dimDownState;
@@ -25,20 +24,25 @@ public class StartingState implements State {
 	@Inject
 	private Event<LightStateOutputEvent> lightStateOutputEvent;
 
+	@Inject
+	@ConfigValue("repeatingTimeout")
+	private Long repeatingTimeout;
+
 	@Override
 	public State process(final LightStateInputEvent event) {
 		State nextState;
-		switch (event.getType()) {
+		switch (event) {
 		case NegativeEdge:
-			delayLightStateInputEventSender.stopTimer();
+			delayedLightStateInputEventSender.cancelAll();
 			nextState = onState;
 			break;
 		case Timeout:
-			lightStateOutputEvent.fire(new LightStateOutputEvent(Type.Previous));
-			delayLightStateInputEventSender.startTimer(20L, new LightStateInputEvent(InputEventType.Timeout));
+			lightStateOutputEvent.fire(LightStateOutputEvent.DimDown);
+			delayedLightStateInputEventSender.sendDeferred(repeatingTimeout, LightStateInputEvent.Timeout);
 			nextState = dimDownState;
 			break;
 		default:
+			logUnexpectedEvent(event);
 			nextState = this;
 			break;
 		}
