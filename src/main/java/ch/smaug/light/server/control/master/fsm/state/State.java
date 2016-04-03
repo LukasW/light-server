@@ -5,12 +5,17 @@ import org.slf4j.LoggerFactory;
 
 import ch.smaug.light.server.control.master.fsm.event.LightStateInputEvent;
 
-public interface State {
+public abstract class State {
 
-	State process(LightStateInputEvent event);
+	public abstract State process(LightStateInputEvent event);
 
-	default void logUnexpectedEvent(final LightStateInputEvent event) {
+	protected void logUnexpectedEvent(final LightStateInputEvent event) {
 		final Logger log = LoggerFactory.getLogger(OffState.class);
 		log.warn("[{}] Unexpected event: {}", this.getClass().getSimpleName(), event.name());
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
 	}
 }

@@ -10,7 +10,7 @@ import ch.smaug.light.server.control.master.fsm.event.LightStateInputEvent;
 import ch.smaug.light.server.control.master.fsm.event.LightStateOutputEvent;
 
 @ApplicationScoped
-public class OffState implements State {
+public class OffState extends State {
 
 	@Inject
 	private DeferredEvent<LightStateInputEvent> delayLightStateInputEventSender;

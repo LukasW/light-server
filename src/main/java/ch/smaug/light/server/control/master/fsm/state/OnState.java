@@ -8,7 +8,7 @@ import ch.smaug.light.server.cdi.DeferredEvent;
 import ch.smaug.light.server.control.master.fsm.event.LightStateInputEvent;
 
 @ApplicationScoped
-public class OnState implements State {
+public class OnState extends State {
 
 	@Inject
 	private DeferredEvent<LightStateInputEvent> delayLightStateInputEventSender;

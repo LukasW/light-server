@@ -58,6 +58,11 @@
 			<artifactId>logback-classic</artifactId>
 			<version>1.1.3</version>
 		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+			<version>1.7.14</version>
+		</dependency>
 
 		<!-- Apache Commons Java Service -->
 		<dependency>
@@ -190,6 +195,8 @@
 							<commands>
 								<command>sudo service light-server stop</command>
 								<command><![CDATA[sudo tar --overwrite --no-same-owner -xzf ${project.artifactId}.tar.gz -C /opt/light-server]]></command>
+								<command>sudo rm -f /opt/light-server/log/*</command>
+								<command>sudo rm -f /opt/light-server/err/*</command>
 								<command>rm ${project.artifactId}.tar.gz</command>
 								<command>sudo systemctl daemon-reload</command>
 								<command>sudo service light-server start</command>
