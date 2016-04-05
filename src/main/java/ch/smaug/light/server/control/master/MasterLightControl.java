@@ -1,67 +1,73 @@
 package ch.smaug.light.server.control.master;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ch.smaug.light.server.control.linearizing.LinearizedLightControl;
-import ch.smaug.light.server.control.master.fsm.event.LightStateOutputEvent;
 
 @ApplicationScoped
 public class MasterLightControl {
 
-	private final static Logger LOG = LoggerFactory.getLogger(MasterLightControl.class);
-
-	private static final int TURN_ON_PERCENTAGE = 100;
-	private static final int TURN_OFF_PERCENTAGE = 0;
+	private static final int FULL_LIGHT = 100;
+	private static final int NO_LIGHT = 0;
 
 	@Inject
 	private LinearizedLightControl lightControl;
 
-	private int lightPercentage = 0;
+	private int lightIntensityRatio = NO_LIGHT;
+	private int lastLightIntensityRatio = FULL_LIGHT;
+	private boolean dimUp;
 
-	public void consume(@Observes final LightStateOutputEvent lightStateEvent) {
-		LOG.debug("Got event: {}", lightStateEvent);
-		switch (lightStateEvent) {
-		case TurnOff:
-			turnOff();
-			break;
-		case TurnOn:
-			turnOn();
-			break;
-		case DimDown:
-			dimDown();
-			break;
-		case DimUp:
+	public void turnOn() {
+		lightIntensityRatio = lastLightIntensityRatio;
+		writeLightIntensityRatio();
+	}
+
+	public void fullLight() {
+		lightIntensityRatio = FULL_LIGHT;
+		lastLightIntensityRatio = lightIntensityRatio;
+		writeLightIntensityRatio();
+	}
+
+	public void turnOff() {
+		lightIntensityRatio = NO_LIGHT;
+		writeLightIntensityRatio();
+	}
+
+	public void dim() {
+		if (dimUp) {
 			dimUp();
-			break;
+		} else {
+			dimDown();
 		}
+		lastLightIntensityRatio = lightIntensityRatio;
+		writeLightIntensityRatio();
 	}
 
-	private void turnOn() {
-		lightPercentage = TURN_ON_PERCENTAGE;
-		writePercentage();
-	}
-
-	private void turnOff() {
-		lightPercentage = TURN_OFF_PERCENTAGE;
-		writePercentage();
+	public boolean isOff() {
+		return lightIntensityRatio == NO_LIGHT;
 	}
 
 	private void dimUp() {
-		lightPercentage = (lightPercentage + 1) % 101;
-		writePercentage();
+		if (lightIntensityRatio == FULL_LIGHT) {
+			dimUp = false;
+			lightIntensityRatio--;
+		} else {
+			lightIntensityRatio++;
+		}
 	}
 
 	private void dimDown() {
-		lightPercentage = (lightPercentage + 100) % 101;
-		writePercentage();
+		if (lightIntensityRatio == NO_LIGHT) {
+			dimUp = true;
+			lightIntensityRatio++;
+		} else {
+			lightIntensityRatio--;
+		}
 	}
 
-	private void writePercentage() {
-		lightControl.setLevel(lightPercentage);
+	private void writeLightIntensityRatio() {
+		lightControl.setLevel(lightIntensityRatio);
 	}
+
 }

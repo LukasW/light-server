@@ -1,4 +1,3 @@
-
 package ch.smaug.light.server.control.master.fsm.state;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -16,16 +15,16 @@ import ch.smaug.light.server.control.master.MasterLightControl;
 import ch.smaug.light.server.control.master.fsm.event.LightStateInputEvent;
 
 @RunWith(MockitoJUnitRunner.class)
-public class StartingStateTest extends AbstractStateTest<StartingState> {
+public class PreMaxStateTest extends AbstractStateTest<PreMaxState> {
 
 	@InjectMocks
-	final StartingState testee = new StartingState();
+	private final PreMaxState testee = new PreMaxState();
+
+	@Mock
+	private OnState onState;
 
 	@Mock
 	private DimState dimState;
-
-	@Mock
-	private PreOnState preOnState;
 
 	@Mock
 	private MasterLightControl masterLightControl;
@@ -40,26 +39,26 @@ public class StartingStateTest extends AbstractStateTest<StartingState> {
 	}
 
 	@Test
-	public void processEvent_negativeEdge_preOnState() {
+	public void processEvent_negativeEdge_onState() {
 		// arrange
 		// act
 		final AbstractState nextState = testee.process(LightStateInputEvent.NegativeEdge);
 		// assert
-		assertThat(nextState, is(equalTo(preOnState)));
+		assertThat(nextState, is(equalTo(onState)));
+		verify(masterLightControl).fullLight();
 	}
 
 	@Test
-	public void onEnter_startStartingTimeoutAndTurnOnLight() {
+	public void onEnter_startStartingTimeout() {
 		// arrange
 		// act
 		testee.onEnter();
 		// verify
 		assertSendDeferredEvent(TEST_STARTING_TIMEOUT, LightStateInputEvent.Timeout);
-		verify(masterLightControl).turnOn();
 	}
 
 	@Override
-	protected StartingState getTestee() {
+	protected PreMaxState getTestee() {
 		return testee;
 	}
 }

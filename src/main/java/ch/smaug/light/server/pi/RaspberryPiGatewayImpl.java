@@ -48,7 +48,7 @@ public class RaspberryPiGatewayImpl implements RaspberryPiGateway {
 		myButton.addListener(new GpioPinListenerDigital() {
 			@Override
 			public void handleGpioPinDigitalStateChangeEvent(final GpioPinDigitalStateChangeEvent event) {
-				LOG.debug("Got Gpio Event: Pin={}, State={}", event.getPin().getName(), event.getState().getName());
+				LOG.debug("Got Gpio Event: Pin={}, AbstractState={}", event.getPin().getName(), event.getState().getName());
 				keyButtonEvent.get().fire(new KeyButtonEvent(Key.Key1, event.getState().isHigh() ? Edge.Negative : Edge.Positive));
 			}
 		});

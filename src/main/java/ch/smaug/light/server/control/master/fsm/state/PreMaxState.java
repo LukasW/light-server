@@ -1,19 +1,16 @@
 package ch.smaug.light.server.control.master.fsm.state;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import ch.smaug.light.server.control.master.MasterLightControl;
 import ch.smaug.light.server.control.master.fsm.event.LightStateInputEvent;
 
-@ApplicationScoped
-public class StartingState extends AbstractState {
-
+public class PreMaxState extends AbstractState {
 	@Inject
 	private DimState dimState;
 
 	@Inject
-	private PreOnState preOnState;
+	private OnState onState;
 
 	@Inject
 	private MasterLightControl masterLightControl;
@@ -21,7 +18,6 @@ public class StartingState extends AbstractState {
 	@Override
 	public void onEnter() {
 		super.onEnter();
-		masterLightControl.turnOn();
 		sendStartingTimeout();
 	}
 
@@ -30,7 +26,8 @@ public class StartingState extends AbstractState {
 		AbstractState nextState;
 		switch (event) {
 		case NegativeEdge:
-			nextState = preOnState;
+			masterLightControl.fullLight();
+			nextState = onState;
 			break;
 		case Timeout:
 			nextState = dimState;

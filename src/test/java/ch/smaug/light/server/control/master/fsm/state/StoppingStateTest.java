@@ -1,10 +1,8 @@
-
 package ch.smaug.light.server.control.master.fsm.state;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.verify;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,26 +10,22 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import ch.smaug.light.server.control.master.MasterLightControl;
 import ch.smaug.light.server.control.master.fsm.event.LightStateInputEvent;
 
 @RunWith(MockitoJUnitRunner.class)
-public class StartingStateTest extends AbstractStateTest<StartingState> {
+public class StoppingStateTest extends AbstractStateTest<StoppingState> {
 
 	@InjectMocks
-	final StartingState testee = new StartingState();
+	private final StoppingState testee = new StoppingState();
+
+	@Mock
+	private OffState offState;
 
 	@Mock
 	private DimState dimState;
 
-	@Mock
-	private PreOnState preOnState;
-
-	@Mock
-	private MasterLightControl masterLightControl;
-
 	@Test
-	public void processEvent_timeOut_dimState() {
+	public void processEvent_timeOut_dimUpStateAndSendDimRequest() {
 		// arrange
 		// act
 		final AbstractState nextState = testee.process(LightStateInputEvent.Timeout);
@@ -40,26 +34,25 @@ public class StartingStateTest extends AbstractStateTest<StartingState> {
 	}
 
 	@Test
-	public void processEvent_negativeEdge_preOnState() {
+	public void processEvent_negativeEdge_offState() {
 		// arrange
 		// act
 		final AbstractState nextState = testee.process(LightStateInputEvent.NegativeEdge);
 		// assert
-		assertThat(nextState, is(equalTo(preOnState)));
+		assertThat(nextState, is(equalTo(offState)));
 	}
 
 	@Test
-	public void onEnter_startStartingTimeoutAndTurnOnLight() {
+	public void onEnter_startStartingTimeout() {
 		// arrange
 		// act
 		testee.onEnter();
 		// verify
 		assertSendDeferredEvent(TEST_STARTING_TIMEOUT, LightStateInputEvent.Timeout);
-		verify(masterLightControl).turnOn();
 	}
 
 	@Override
-	protected StartingState getTestee() {
+	protected StoppingState getTestee() {
 		return testee;
 	}
 }

@@ -2,31 +2,27 @@ package ch.smaug.light.server.control.master;
 
 import static org.mockito.Mockito.verify;
 
-import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
-
-import org.jglue.cdiunit.CdiRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import ch.smaug.light.server.control.linearizing.LinearizedLightControl;
-import ch.smaug.light.server.control.master.fsm.event.LightStateOutputEvent;
 
-@RunWith(CdiRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class MasterLightControlTest {
 
 	@Mock
-	@Produces
 	private LinearizedLightControl lightControl;
 
-	@Inject
-	private MasterLightControl testee;
+	@InjectMocks
+	private final MasterLightControl testee = new MasterLightControl();
 
 	@Test
 	public void turnOn_setLevelTo100Percent() {
 		// Act
-		testee.consume(LightStateOutputEvent.TurnOn);
+		testee.fullLight();
 		// Assert
 		verify(lightControl).setLevel(100);
 	}
@@ -34,7 +30,7 @@ public class MasterLightControlTest {
 	@Test
 	public void turnOn_setLevelTo0Percent() {
 		// Act
-		testee.consume(LightStateOutputEvent.TurnOff);
+		testee.turnOff();
 		// Assert
 		verify(lightControl).setLevel(0);
 	}
@@ -42,9 +38,9 @@ public class MasterLightControlTest {
 	@Test
 	public void dimDown_fullLight_decreaseLevel() {
 		// Arrange
-		testee.consume(LightStateOutputEvent.TurnOn);
+		testee.fullLight();
 		// Act
-		testee.consume(LightStateOutputEvent.DimDown);
+		testee.dim();
 		// Assert
 		verify(lightControl).setLevel(99);
 	}
@@ -52,28 +48,11 @@ public class MasterLightControlTest {
 	@Test
 	public void dimDown_noLight_setLevelToMaximum() {
 		// Arrange
+		testee.turnOff();
 		// Act
-		testee.consume(LightStateOutputEvent.DimDown);
-		// Assert
-		verify(lightControl).setLevel(100);
-	}
-
-	@Test
-	public void dimUp_noLight_increaseLevel() {
-		// Arrange
-		// Act
-		testee.consume(LightStateOutputEvent.DimUp);
+		testee.dim();
+		testee.dim();
 		// Assert
 		verify(lightControl).setLevel(1);
-	}
-
-	@Test
-	public void dimUp_fullLight_setLevelToMaximum() {
-		// Arrange
-		testee.consume(LightStateOutputEvent.TurnOn);
-		// Act
-		testee.consume(LightStateOutputEvent.DimUp);
-		// Assert
-		verify(lightControl).setLevel(0);
 	}
 }

@@ -3,46 +3,35 @@ package ch.smaug.light.server.control.master.fsm.state;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.verify;
 
-import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
-
-import org.jglue.cdiunit.ActivatedAlternatives;
-import org.jglue.cdiunit.CdiRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import ch.smaug.light.server.cdi.DeferredEvent;
-import ch.smaug.light.server.cdi.TestConfigValueProducer;
 import ch.smaug.light.server.control.master.fsm.event.LightStateInputEvent;
 
-@RunWith(CdiRunner.class)
-@ActivatedAlternatives(TestConfigValueProducer.class)
-public class OnStateTest {
+@RunWith(MockitoJUnitRunner.class)
+public class OnStateTest extends AbstractStateTest<OnState> {
 
-	@Inject
-	private TestConfigValueProducer testConfigValueProducer;
-
-	@Inject
-	private OnState testee;
-
-	@Inject
-	private PressedState pressedState;
+	@InjectMocks
+	private final OnState testee = new OnState();
 
 	@Mock
-	@Produces
-	private DeferredEvent<LightStateInputEvent> delayedLightStateInputEventSender;
+	private StoppingState stoppingState;
 
 	@Test
-	public void processEvent_positiveEvent() {
+	public void processEvent_positiveEdge_stoppingState() {
 		// arrange
-		testConfigValueProducer.setConfigValue("startingTimeout", 19L);
 		// act
-		final State nextState = testee.process(LightStateInputEvent.PositiveEdge);
+		final AbstractState nextState = testee.process(LightStateInputEvent.PositiveEdge);
 		// assert
-		verify(delayedLightStateInputEventSender).sendDeferred(19, LightStateInputEvent.Timeout);
-		assertThat(nextState, is(equalTo(pressedState)));
+		assertThat(nextState, is(equalTo(stoppingState)));
+	}
+
+	@Override
+	protected OnState getTestee() {
+		return testee;
 	}
 }

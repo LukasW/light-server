@@ -1,9 +1,9 @@
+
 package ch.smaug.light.server.control.master.fsm.state;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.verify;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,37 +15,49 @@ import ch.smaug.light.server.control.master.MasterLightControl;
 import ch.smaug.light.server.control.master.fsm.event.LightStateInputEvent;
 
 @RunWith(MockitoJUnitRunner.class)
-public class OffStateTest extends AbstractStateTest<OffState> {
+public class PreOnStateTest extends AbstractStateTest<PreOnState> {
 
 	@InjectMocks
-	private final OffState testee = new OffState();
+	private final PreOnState testee = new PreOnState();
 
 	@Mock
-	private StartingState startingState;
+	private OnState onState;
+
+	@Mock
+	private PreMaxState preMaxState;
 
 	@Mock
 	private MasterLightControl masterLightControl;
 
 	@Test
-	public void processEvent_positiveEdge_startingState() {
+	public void processEvent_timeOut_onState() {
+		// arrange
+		// act
+		final AbstractState nextState = testee.process(LightStateInputEvent.Timeout);
+		// assert
+		assertThat(nextState, is(equalTo(onState)));
+	}
+
+	@Test
+	public void processEvent_positiveEdge_preMaxState() {
 		// arrange
 		// act
 		final AbstractState nextState = testee.process(LightStateInputEvent.PositiveEdge);
 		// assert
-		assertThat(nextState, is(equalTo(startingState)));
+		assertThat(nextState, is(equalTo(preMaxState)));
 	}
 
 	@Test
-	public void onEnter_turnLightOff() {
+	public void onEnter_startStartingTimeout() {
 		// arrange
 		// act
 		testee.onEnter();
-		// assert
-		verify(masterLightControl).turnOff();
+		// verify
+		assertSendDeferredEvent(TEST_STARTING_TIMEOUT, LightStateInputEvent.Timeout);
 	}
 
 	@Override
-	protected OffState getTestee() {
+	protected PreOnState getTestee() {
 		return testee;
 	}
 }

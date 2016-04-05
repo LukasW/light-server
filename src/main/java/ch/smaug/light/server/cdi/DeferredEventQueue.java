@@ -15,6 +15,7 @@ class DeferredEventQueue {
 		for (final TimerTask timerTask : queue) {
 			timerTask.cancel();
 		}
+		queue.clear();
 	}
 
 	public synchronized void add(final TimerTask timerTask) {

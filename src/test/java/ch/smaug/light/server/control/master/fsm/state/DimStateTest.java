@@ -1,9 +1,9 @@
-
 package ch.smaug.light.server.control.master.fsm.state;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 import org.junit.Test;
@@ -16,16 +16,16 @@ import ch.smaug.light.server.control.master.MasterLightControl;
 import ch.smaug.light.server.control.master.fsm.event.LightStateInputEvent;
 
 @RunWith(MockitoJUnitRunner.class)
-public class StartingStateTest extends AbstractStateTest<StartingState> {
+public class DimStateTest extends AbstractStateTest<DimState> {
 
 	@InjectMocks
-	final StartingState testee = new StartingState();
+	private final DimState testee = new DimState();
 
 	@Mock
-	private DimState dimState;
+	private OnState onState;
 
 	@Mock
-	private PreOnState preOnState;
+	private OffState offState;
 
 	@Mock
 	private MasterLightControl masterLightControl;
@@ -36,30 +36,41 @@ public class StartingStateTest extends AbstractStateTest<StartingState> {
 		// act
 		final AbstractState nextState = testee.process(LightStateInputEvent.Timeout);
 		// assert
-		assertThat(nextState, is(equalTo(dimState)));
+		assertThat(nextState, is(equalTo(testee)));
 	}
 
 	@Test
-	public void processEvent_negativeEdge_preOnState() {
+	public void processEvent_negativeEdgeAndLightIsOn_onState() {
 		// arrange
+		doReturn(false).when(masterLightControl).isOff();
 		// act
 		final AbstractState nextState = testee.process(LightStateInputEvent.NegativeEdge);
 		// assert
-		assertThat(nextState, is(equalTo(preOnState)));
+		assertThat(nextState, is(equalTo(onState)));
 	}
 
 	@Test
-	public void onEnter_startStartingTimeoutAndTurnOnLight() {
+	public void processEvent_negativeEdgeAndLightIsOff_offState() {
+		// arrange
+		doReturn(true).when(masterLightControl).isOff();
+		// act
+		final AbstractState nextState = testee.process(LightStateInputEvent.NegativeEdge);
+		// assert
+		assertThat(nextState, is(equalTo(offState)));
+	}
+
+	@Test
+	public void onEnter_startStartingTimeoutAndDim() {
 		// arrange
 		// act
 		testee.onEnter();
 		// verify
-		assertSendDeferredEvent(TEST_STARTING_TIMEOUT, LightStateInputEvent.Timeout);
-		verify(masterLightControl).turnOn();
+		assertSendDeferredEvent(TEST_REPEATING_TIMEOUT, LightStateInputEvent.Timeout);
+		verify(masterLightControl).dim();
 	}
 
 	@Override
-	protected StartingState getTestee() {
+	protected DimState getTestee() {
 		return testee;
 	}
 }
