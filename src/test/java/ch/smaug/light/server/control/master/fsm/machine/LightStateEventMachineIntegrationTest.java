@@ -54,8 +54,8 @@ public class LightStateEventMachineIntegrationTest {
 	public void turnLightOn() {
 		// Arrange
 		// Act
-		testee.processEvent(LightStateInputEvent.PositiveEdge);
-		testee.processEvent(LightStateInputEvent.NegativeEdge);
+		testee.processEvent(LightStateInputEvent.createPositiveEdgeEvent("K1"));
+		testee.processEvent(LightStateInputEvent.createNegativeEdgeEvent("K1"));
 		// Assert
 		verify(masterLightControl).turnOn();
 	}
@@ -65,8 +65,8 @@ public class LightStateEventMachineIntegrationTest {
 		// Arrange
 		testee.setState(instance.select(OnState.class).get());
 		// Act
-		testee.processEvent(LightStateInputEvent.PositiveEdge);
-		testee.processEvent(LightStateInputEvent.NegativeEdge);
+		testee.processEvent(LightStateInputEvent.createPositiveEdgeEvent("K1"));
+		testee.processEvent(LightStateInputEvent.createNegativeEdgeEvent("K1"));
 		// Assert
 		verify(masterLightControl).turnOff();
 	}
@@ -76,9 +76,9 @@ public class LightStateEventMachineIntegrationTest {
 		// Arrange
 		testee.setState(instance.select(OnState.class).get());
 		// Act
-		testee.processEvent(LightStateInputEvent.PositiveEdge);
-		testee.processEvent(LightStateInputEvent.Timeout);
-		testee.processEvent(LightStateInputEvent.NegativeEdge);
+		testee.processEvent(LightStateInputEvent.createPositiveEdgeEvent("K1"));
+		testee.processEvent(LightStateInputEvent.createTimeoutEvent());
+		testee.processEvent(LightStateInputEvent.createNegativeEdgeEvent("K1"));
 		// Assert
 		verify(masterLightControl).dim();
 	}
@@ -87,9 +87,9 @@ public class LightStateEventMachineIntegrationTest {
 	public void turnLightOn_dim() {
 		// Arrange
 		// Act
-		testee.processEvent(LightStateInputEvent.PositiveEdge);
-		testee.processEvent(LightStateInputEvent.Timeout);
-		testee.processEvent(LightStateInputEvent.NegativeEdge);
+		testee.processEvent(LightStateInputEvent.createPositiveEdgeEvent("K1"));
+		testee.processEvent(LightStateInputEvent.createTimeoutEvent());
+		testee.processEvent(LightStateInputEvent.createNegativeEdgeEvent("K1"));
 		// Assert
 		final InOrder inOrder = Mockito.inOrder(masterLightControl);
 		inOrder.verify(masterLightControl).turnOn();
@@ -102,10 +102,10 @@ public class LightStateEventMachineIntegrationTest {
 	public void turnLightOn_fullLight() {
 		// Arrange
 		// Act
-		testee.processEvent(LightStateInputEvent.PositiveEdge);
-		testee.processEvent(LightStateInputEvent.NegativeEdge);
-		testee.processEvent(LightStateInputEvent.PositiveEdge);
-		testee.processEvent(LightStateInputEvent.NegativeEdge);
+		testee.processEvent(LightStateInputEvent.createPositiveEdgeEvent("K1"));
+		testee.processEvent(LightStateInputEvent.createNegativeEdgeEvent("K1"));
+		testee.processEvent(LightStateInputEvent.createPositiveEdgeEvent("K1"));
+		testee.processEvent(LightStateInputEvent.createNegativeEdgeEvent("K1"));
 		// Assert
 		final InOrder inOrder = Mockito.inOrder(masterLightControl);
 		inOrder.verify(masterLightControl).turnOn();

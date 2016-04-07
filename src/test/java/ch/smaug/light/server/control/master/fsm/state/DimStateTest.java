@@ -34,7 +34,7 @@ public class DimStateTest extends AbstractStateTest<DimState> {
 	public void processEvent_timeOut_dimState() {
 		// arrange
 		// act
-		final AbstractState nextState = testee.process(LightStateInputEvent.Timeout);
+		final AbstractState nextState = testee.process(LightStateInputEvent.createTimeoutEvent());
 		// assert
 		assertThat(nextState, is(equalTo(testee)));
 	}
@@ -44,7 +44,7 @@ public class DimStateTest extends AbstractStateTest<DimState> {
 		// arrange
 		doReturn(false).when(masterLightControl).isOff();
 		// act
-		final AbstractState nextState = testee.process(LightStateInputEvent.NegativeEdge);
+		final AbstractState nextState = testee.process(LightStateInputEvent.createNegativeEdgeEvent("Key1"));
 		// assert
 		assertThat(nextState, is(equalTo(onState)));
 	}
@@ -54,7 +54,7 @@ public class DimStateTest extends AbstractStateTest<DimState> {
 		// arrange
 		doReturn(true).when(masterLightControl).isOff();
 		// act
-		final AbstractState nextState = testee.process(LightStateInputEvent.NegativeEdge);
+		final AbstractState nextState = testee.process(LightStateInputEvent.createNegativeEdgeEvent("Key1"));
 		// assert
 		assertThat(nextState, is(equalTo(offState)));
 	}
@@ -65,7 +65,7 @@ public class DimStateTest extends AbstractStateTest<DimState> {
 		// act
 		testee.onEnter();
 		// verify
-		assertSendDeferredEvent(TEST_REPEATING_TIMEOUT, LightStateInputEvent.Timeout);
+		assertSendDeferredEvent(TEST_REPEATING_TIMEOUT, LightStateInputEvent.createTimeoutEvent());
 		verify(masterLightControl).dim();
 	}
 

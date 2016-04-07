@@ -23,7 +23,7 @@ public class PreOnState extends AbstractState {
 	@Override
 	public AbstractState process(final LightStateInputEvent event) {
 		AbstractState nextState;
-		switch (event) {
+		switch (event.getType()) {
 		case Timeout:
 			nextState = onState;
 			break;

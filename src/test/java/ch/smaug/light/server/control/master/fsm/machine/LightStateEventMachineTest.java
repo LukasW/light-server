@@ -28,12 +28,12 @@ public class LightStateEventMachineTest {
 	public void processEvent_callbackMethodsAreCalled() {
 		// arrange
 		testee.setState(startingState);
-		doReturn(endingState).when(startingState).process(LightStateInputEvent.NegativeEdge);
+		doReturn(endingState).when(startingState).process(LightStateInputEvent.createNegativeEdgeEvent("Key1"));
 		// act
-		testee.processEvent(LightStateInputEvent.NegativeEdge);
+		testee.processEvent(LightStateInputEvent.createNegativeEdgeEvent("Key1"));
 		// assert
 		verify(startingState).exit();
-		verify(startingState).process(LightStateInputEvent.NegativeEdge);
+		verify(startingState).process(LightStateInputEvent.createNegativeEdgeEvent("Key1"));
 		verify(endingState).enter();
 	}
 
@@ -42,10 +42,10 @@ public class LightStateEventMachineTest {
 		// arrange
 		testee.setState(startingState);
 		// act
-		testee.processEvent(LightStateInputEvent.NegativeEdge);
+		testee.processEvent(LightStateInputEvent.createNegativeEdgeEvent("Key1"));
 		// assert
 		verify(startingState).exit();
-		verify(startingState).process(LightStateInputEvent.NegativeEdge);
+		verify(startingState).process(LightStateInputEvent.createNegativeEdgeEvent("Key1"));
 		verify(startingState).enter();
 	}
 }

@@ -106,6 +106,19 @@ public class LightServerAcceptanceTest {
 		assertThat(pwmValue, is(equalTo(933)));
 	}
 
+	@Test
+	public void lightIsOff_moreThenOneKeyIsPressed_firstKeyWins() {
+		// arrange
+		// act
+		keyButtonEvent.fire(new KeyButtonEvent(Key.Key1, Edge.Positive));
+		keyButtonEvent.fire(new KeyButtonEvent(Key.Key2, Edge.Positive));
+		keyButtonEvent.fire(new KeyButtonEvent(Key.Key2, Edge.Negative));
+		waitForEndOfTimeout();
+		keyButtonEvent.fire(new KeyButtonEvent(Key.Key1, Edge.Negative));
+		// assert
+		assertThat(raspberryPiGatewayMock.getPwm(), is(equalTo(933)));
+	}
+
 	private void turnOn() {
 		fireShortClick();
 		assumeThat(raspberryPiGatewayMock.getPwm(), is(1000));
@@ -139,7 +152,7 @@ public class LightServerAcceptanceTest {
 	}
 
 	public void onLightStateInputEvent(@Observes final LightStateInputEvent event) {
-		if (event.equals(LightStateInputEvent.Timeout)) {
+		if (event.equals(LightStateInputEvent.createTimeoutEvent())) {
 			timeout.release();
 		}
 	}

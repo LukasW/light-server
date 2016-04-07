@@ -28,7 +28,7 @@ public class LightStateEventMachine {
 	}
 
 	public synchronized void processEvent(@Observes final LightStateInputEvent event) {
-		LOG.debug("[{}] Processing event: {}", state.getName(), event.name());
+		LOG.debug("[{}] Processing event: {}", state.getName(), event.getType().name());
 		state.exit();
 		AbstractState newState = state.process(event);
 		if (newState == null) {
@@ -40,7 +40,7 @@ public class LightStateEventMachine {
 	}
 
 	private void logUnexpectedEvent(final AbstractState state, final LightStateInputEvent event) {
-		LOG.warn("[{}] Unexpected event: {}", state.getName(), event.name());
+		LOG.warn("[{}] Unexpected event: {}", state.getName(), event.getType().name());
 	}
 
 	void setState(final AbstractState state) {

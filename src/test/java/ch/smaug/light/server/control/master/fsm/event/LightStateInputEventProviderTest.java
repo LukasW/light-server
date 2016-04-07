@@ -1,46 +1,74 @@
 package ch.smaug.light.server.control.master.fsm.event;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
+import java.util.Optional;
 
-import org.jglue.cdiunit.CdiRunner;
+import javax.enterprise.event.Event;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+import ch.smaug.light.server.control.master.fsm.machine.KeyLock;
 import ch.smaug.light.server.pi.KeyButtonEvent;
 import ch.smaug.light.server.pi.KeyButtonEvent.Edge;
 import ch.smaug.light.server.pi.KeyButtonEvent.Key;
 
-@RunWith(CdiRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class LightStateInputEventProviderTest {
 
-	@Inject
-	private LightStateInputEventProvider testee;
-	private LightStateInputEvent lastEvent;
+	@Mock
+	private Event<LightStateInputEvent> lightStateInputEvent;
+
+	@Mock
+	private KeyLock keyLock;
+
+	@InjectMocks
+	private final LightStateInputEventProvider testee = new LightStateInputEventProvider();
 
 	@Test
 	public void processKeyButtonEvent_positiveEdge_firePositiveEdge() {
 		// arrange
+		doReturn(Optional.empty()).when(keyLock).getLockedKey();
 		// act
 		testee.processKeyButtonEvent(new KeyButtonEvent(Key.Key1, Edge.Positive));
 		// assert
-		assertThat(lastEvent, is(equalTo(LightStateInputEvent.PositiveEdge)));
+		verify(lightStateInputEvent).fire(LightStateInputEvent.createPositiveEdgeEvent("Key1"));
 	}
 
 	@Test
 	public void processKeyButtonEvent_negativeEdge_fireNegativeEdge() {
 		// arrange
+		doReturn(Optional.empty()).when(keyLock).getLockedKey();
 		// act
 		testee.processKeyButtonEvent(new KeyButtonEvent(Key.Key1, Edge.Negative));
 		// assert
-		assertThat(lastEvent, is(equalTo(LightStateInputEvent.NegativeEdge)));
+		verify(lightStateInputEvent).fire(LightStateInputEvent.createNegativeEdgeEvent("Key1"));
 	}
 
-	public void process(@Observes final LightStateInputEvent event) {
-		this.lastEvent = event;
+	@Test
+	public void processKeyButtonEvent_lockedForOtherKey_ignoreMessage() {
+		// arrange
+		doReturn(Optional.of(Key.Key1.name())).when(keyLock).getLockedKey();
+		// act
+		testee.processKeyButtonEvent(new KeyButtonEvent(Key.Key2, Edge.Negative));
+		// assert
+		verify(lightStateInputEvent, never()).fire(Matchers.any(LightStateInputEvent.class));
+	}
+
+	@Test
+	public void processKeyButtonEvent_lockedForSameKey_messageIsFired() {
+		// arrange
+		doReturn(Optional.of(Key.Key1.name())).when(keyLock).getLockedKey();
+		// act
+		testee.processKeyButtonEvent(new KeyButtonEvent(Key.Key2, Edge.Negative));
+		// assert
+		verify(lightStateInputEvent, never()).fire(Matchers.any(LightStateInputEvent.class));
 	}
 }

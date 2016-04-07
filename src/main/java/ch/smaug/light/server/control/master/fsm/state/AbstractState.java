@@ -48,11 +48,11 @@ public abstract class AbstractState {
 	}
 
 	public void sendStartingTimeout() {
-		delayedLightStateInputEventSender.sendDeferred(startingTimeout, LightStateInputEvent.Timeout);
+		delayedLightStateInputEventSender.sendDeferred(startingTimeout, LightStateInputEvent.createTimeoutEvent());
 	}
 
 	public void sendRepeatingTimeout() {
-		delayedLightStateInputEventSender.sendDeferred(repeatingTimeout, LightStateInputEvent.Timeout);
+		delayedLightStateInputEventSender.sendDeferred(repeatingTimeout, LightStateInputEvent.createTimeoutEvent());
 	}
 
 	protected DeferredEvent<LightStateInputEvent> getDelayedLightStateInputEventSender() {

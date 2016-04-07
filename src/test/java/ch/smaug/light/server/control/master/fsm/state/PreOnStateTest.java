@@ -33,7 +33,7 @@ public class PreOnStateTest extends AbstractStateTest<PreOnState> {
 	public void processEvent_timeOut_onState() {
 		// arrange
 		// act
-		final AbstractState nextState = testee.process(LightStateInputEvent.Timeout);
+		final AbstractState nextState = testee.process(LightStateInputEvent.createTimeoutEvent());
 		// assert
 		assertThat(nextState, is(equalTo(onState)));
 	}
@@ -42,7 +42,7 @@ public class PreOnStateTest extends AbstractStateTest<PreOnState> {
 	public void processEvent_positiveEdge_preMaxState() {
 		// arrange
 		// act
-		final AbstractState nextState = testee.process(LightStateInputEvent.PositiveEdge);
+		final AbstractState nextState = testee.process(LightStateInputEvent.createPositiveEdgeEvent("Key1"));
 		// assert
 		assertThat(nextState, is(equalTo(preMaxState)));
 	}
@@ -53,7 +53,7 @@ public class PreOnStateTest extends AbstractStateTest<PreOnState> {
 		// act
 		testee.onEnter();
 		// verify
-		assertSendDeferredEvent(TEST_STARTING_TIMEOUT, LightStateInputEvent.Timeout);
+		assertSendDeferredEvent(TEST_STARTING_TIMEOUT, LightStateInputEvent.createTimeoutEvent());
 	}
 
 	@Override

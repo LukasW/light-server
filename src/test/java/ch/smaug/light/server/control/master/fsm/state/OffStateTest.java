@@ -13,6 +13,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import ch.smaug.light.server.control.master.MasterLightControl;
 import ch.smaug.light.server.control.master.fsm.event.LightStateInputEvent;
+import ch.smaug.light.server.control.master.fsm.machine.KeyLock;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OffStateTest extends AbstractStateTest<OffState> {
@@ -26,22 +27,27 @@ public class OffStateTest extends AbstractStateTest<OffState> {
 	@Mock
 	private MasterLightControl masterLightControl;
 
+	@Mock
+	private KeyLock keyLock;
+
 	@Test
-	public void processEvent_positiveEdge_startingState() {
+	public void processEvent_positiveEdge_startingStateAndLockKey() {
 		// arrange
 		// act
-		final AbstractState nextState = testee.process(LightStateInputEvent.PositiveEdge);
+		final AbstractState nextState = testee.process(LightStateInputEvent.createPositiveEdgeEvent("Key1"));
 		// assert
 		assertThat(nextState, is(equalTo(startingState)));
+		verify(keyLock).acquireLock("Key1");
 	}
 
 	@Test
-	public void onEnter_turnLightOff() {
+	public void onEnter_turnLightOffAndReleaseKeyLock() {
 		// arrange
 		// act
 		testee.onEnter();
 		// assert
 		verify(masterLightControl).turnOff();
+		verify(keyLock).releaseLock();
 	}
 
 	@Override

@@ -28,7 +28,7 @@ public class StoppingStateTest extends AbstractStateTest<StoppingState> {
 	public void processEvent_timeOut_dimUpStateAndSendDimRequest() {
 		// arrange
 		// act
-		final AbstractState nextState = testee.process(LightStateInputEvent.Timeout);
+		final AbstractState nextState = testee.process(LightStateInputEvent.createTimeoutEvent());
 		// assert
 		assertThat(nextState, is(equalTo(dimState)));
 	}
@@ -37,7 +37,7 @@ public class StoppingStateTest extends AbstractStateTest<StoppingState> {
 	public void processEvent_negativeEdge_offState() {
 		// arrange
 		// act
-		final AbstractState nextState = testee.process(LightStateInputEvent.NegativeEdge);
+		final AbstractState nextState = testee.process(LightStateInputEvent.createNegativeEdgeEvent("Key1"));
 		// assert
 		assertThat(nextState, is(equalTo(offState)));
 	}
@@ -48,7 +48,7 @@ public class StoppingStateTest extends AbstractStateTest<StoppingState> {
 		// act
 		testee.onEnter();
 		// verify
-		assertSendDeferredEvent(TEST_STARTING_TIMEOUT, LightStateInputEvent.Timeout);
+		assertSendDeferredEvent(TEST_STARTING_TIMEOUT, LightStateInputEvent.createTimeoutEvent());
 	}
 
 	@Override

@@ -17,7 +17,7 @@ public class StoppingState extends AbstractState {
 	@Override
 	public AbstractState process(final LightStateInputEvent event) {
 		AbstractState nextState;
-		switch (event) {
+		switch (event.getType()) {
 		case NegativeEdge:
 			nextState = offState;
 			break;

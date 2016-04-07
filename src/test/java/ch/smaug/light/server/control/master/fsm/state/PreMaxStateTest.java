@@ -33,7 +33,7 @@ public class PreMaxStateTest extends AbstractStateTest<PreMaxState> {
 	public void processEvent_timeOut_dimState() {
 		// arrange
 		// act
-		final AbstractState nextState = testee.process(LightStateInputEvent.Timeout);
+		final AbstractState nextState = testee.process(LightStateInputEvent.createTimeoutEvent());
 		// assert
 		assertThat(nextState, is(equalTo(dimState)));
 	}
@@ -42,7 +42,7 @@ public class PreMaxStateTest extends AbstractStateTest<PreMaxState> {
 	public void processEvent_negativeEdge_onState() {
 		// arrange
 		// act
-		final AbstractState nextState = testee.process(LightStateInputEvent.NegativeEdge);
+		final AbstractState nextState = testee.process(LightStateInputEvent.createNegativeEdgeEvent("Key1"));
 		// assert
 		assertThat(nextState, is(equalTo(onState)));
 		verify(masterLightControl).fullLight();
@@ -54,7 +54,7 @@ public class PreMaxStateTest extends AbstractStateTest<PreMaxState> {
 		// act
 		testee.onEnter();
 		// verify
-		assertSendDeferredEvent(TEST_STARTING_TIMEOUT, LightStateInputEvent.Timeout);
+		assertSendDeferredEvent(TEST_STARTING_TIMEOUT, LightStateInputEvent.createTimeoutEvent());
 	}
 
 	@Override

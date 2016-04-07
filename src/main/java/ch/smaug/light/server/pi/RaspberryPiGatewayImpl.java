@@ -30,7 +30,9 @@ public class RaspberryPiGatewayImpl implements RaspberryPiGateway {
 
 	private final GpioPinPwmOutput pwmOutput;
 
-	private final GpioPinDigitalInput myButton;
+	private final GpioPinDigitalInput button1;
+
+	private final GpioPinDigitalInput button2;
 
 	private final GpioController gpioController;
 
@@ -44,12 +46,21 @@ public class RaspberryPiGatewayImpl implements RaspberryPiGateway {
 		Gpio.pwmSetRange(PWM_RANGE);
 		Gpio.pwmSetClock(100);
 
-		myButton = gpioController.provisionDigitalInputPin(RaspiPin.GPIO_25, PinPullResistance.PULL_UP);
-		myButton.addListener(new GpioPinListenerDigital() {
+		button1 = gpioController.provisionDigitalInputPin(RaspiPin.GPIO_25, PinPullResistance.PULL_UP);
+		button1.addListener(new GpioPinListenerDigital() {
 			@Override
 			public void handleGpioPinDigitalStateChangeEvent(final GpioPinDigitalStateChangeEvent event) {
 				LOG.debug("Got Gpio Event: Pin={}, AbstractState={}", event.getPin().getName(), event.getState().getName());
 				keyButtonEvent.get().fire(new KeyButtonEvent(Key.Key1, event.getState().isHigh() ? Edge.Negative : Edge.Positive));
+			}
+		});
+
+		button2 = gpioController.provisionDigitalInputPin(RaspiPin.GPIO_23, PinPullResistance.PULL_UP);
+		button2.addListener(new GpioPinListenerDigital() {
+			@Override
+			public void handleGpioPinDigitalStateChangeEvent(final GpioPinDigitalStateChangeEvent event) {
+				LOG.debug("Got Gpio Event: Pin={}, AbstractState={}", event.getPin().getName(), event.getState().getName());
+				keyButtonEvent.get().fire(new KeyButtonEvent(Key.Key2, event.getState().isHigh() ? Edge.Negative : Edge.Positive));
 			}
 		});
 	}
