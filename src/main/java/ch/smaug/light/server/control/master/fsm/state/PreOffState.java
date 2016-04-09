@@ -5,34 +5,35 @@ import javax.inject.Inject;
 
 import ch.smaug.light.server.control.master.MasterLightControl;
 import ch.smaug.light.server.control.master.fsm.event.LightStateInputEvent;
-import ch.smaug.light.server.control.master.fsm.event.LightStateInputKeyEvent;
-import ch.smaug.light.server.control.master.fsm.machine.KeyLock;
 
 @ApplicationScoped
-public class OffState extends AbstractState {
+public class PreOffState extends AbstractState {
 
 	@Inject
-	private StartingState startingState;
+	private PreMaxState preMaxState;
+
+	@Inject
+	private OffState offState;
 
 	@Inject
 	private MasterLightControl masterLightControl;
 
-	@Inject
-	private KeyLock keyLock;
-
 	@Override
 	public void onEnter() {
 		super.onEnter();
-		keyLock.releaseLock();
+		sendStartingTimeout();
+		masterLightControl.turnOff();
 	}
 
 	@Override
 	public AbstractState process(final LightStateInputEvent event) {
 		AbstractState nextState;
 		switch (event.getType()) {
+		case Timeout:
+			nextState = offState;
+			break;
 		case PositiveEdge:
-			nextState = startingState;
-			keyLock.acquireLock(((LightStateInputKeyEvent) event).getKeyName());
+			nextState = preMaxState;
 			break;
 		default:
 			nextState = null;

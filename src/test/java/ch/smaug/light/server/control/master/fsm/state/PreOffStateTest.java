@@ -1,8 +1,10 @@
+
 package ch.smaug.light.server.control.master.fsm.state;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.verify;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,49 +12,54 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import ch.smaug.light.server.control.master.MasterLightControl;
 import ch.smaug.light.server.control.master.fsm.event.LightStateInputEvent;
 
 @RunWith(MockitoJUnitRunner.class)
-public class StoppingStateTest extends AbstractStateTest<StoppingState> {
+public class PreOffStateTest extends AbstractStateTest<PreOffState> {
 
 	@InjectMocks
-	private final StoppingState testee = new StoppingState();
+	private final PreOffState testee = new PreOffState();
 
 	@Mock
-	private PreOffState preOffState;
+	private OffState offState;
 
 	@Mock
-	private DimState dimState;
+	private PreMaxState preMaxState;
+
+	@Mock
+	private MasterLightControl masterLightControl;
 
 	@Test
-	public void processEvent_timeOut_dimUpStateAndSendDimRequest() {
+	public void processEvent_timeOut_offState() {
 		// arrange
 		// act
 		final AbstractState nextState = testee.process(LightStateInputEvent.createTimeoutEvent());
 		// assert
-		assertThat(nextState, is(equalTo(dimState)));
+		assertThat(nextState, is(equalTo(offState)));
 	}
 
 	@Test
-	public void processEvent_negativeEdge_offState() {
+	public void processEvent_positiveEdge_preMaxState() {
 		// arrange
 		// act
-		final AbstractState nextState = testee.process(LightStateInputEvent.createNegativeEdgeEvent("Key1"));
+		final AbstractState nextState = testee.process(LightStateInputEvent.createPositiveEdgeEvent("Key1"));
 		// assert
-		assertThat(nextState, is(equalTo(preOffState)));
+		assertThat(nextState, is(equalTo(preMaxState)));
 	}
 
 	@Test
-	public void onEnter_startStartingTimeout() {
+	public void onEnter_startStartingTimeoutAndTurnsLightOff() {
 		// arrange
 		// act
 		testee.onEnter();
 		// verify
 		assertSendDeferredEvent(TEST_STARTING_TIMEOUT, LightStateInputEvent.createTimeoutEvent());
+		verify(masterLightControl).turnOff();
 	}
 
 	@Override
-	protected StoppingState getTestee() {
+	protected PreOffState getTestee() {
 		return testee;
 	}
 }

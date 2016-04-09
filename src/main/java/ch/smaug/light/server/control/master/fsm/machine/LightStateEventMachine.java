@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.smaug.light.server.control.master.MasterLightControl;
 import ch.smaug.light.server.control.master.fsm.event.LightStateInputEvent;
 import ch.smaug.light.server.control.master.fsm.state.AbstractState;
 import ch.smaug.light.server.control.master.fsm.state.OffState;
@@ -21,6 +22,13 @@ public class LightStateEventMachine {
 
 	@Inject
 	private OffState initialState;
+
+	@Inject
+	private MasterLightControl masterLightControl;
+
+	public void initialize() {
+		masterLightControl.turnOff();
+	}
 
 	@PostConstruct
 	public void setInitialState() {
@@ -46,4 +54,5 @@ public class LightStateEventMachine {
 	void setState(final AbstractState state) {
 		this.state = state;
 	}
+
 }

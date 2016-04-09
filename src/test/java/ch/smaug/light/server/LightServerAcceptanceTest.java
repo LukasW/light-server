@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
+import javax.enterprise.event.TransactionPhase;
 import javax.inject.Inject;
 
 import org.jglue.cdiunit.ActivatedAlternatives;
@@ -50,8 +51,23 @@ public class LightServerAcceptanceTest {
 	public void lightIsOff_oneShortClick_turnsLightOn() {
 		// act
 		fireShortClick();
-		final int pwmValue = raspberryPiGatewayMock.getPwm();
 		waitForEndOfTimeout();
+		final int pwmValue = raspberryPiGatewayMock.getPwm();
+		// assert
+		assertThat(pwmValue, is(FULL_LIGHT));
+	}
+
+	@Test
+	public void lightIsOff_twoShortClicks_turnsLightFullOn() {
+		// arrange
+		fireLongClick();
+		assertThat(raspberryPiGatewayMock.getPwm(), is(equalTo(ONE_STEP_DOWN)));
+		fireShortClick();
+		waitForEndOfTimeout();
+		// act
+		fireShortClick();
+		fireShortClick();
+		final int pwmValue = raspberryPiGatewayMock.getPwm();
 		// assert
 		assertThat(pwmValue, is(FULL_LIGHT));
 	}
@@ -82,6 +98,7 @@ public class LightServerAcceptanceTest {
 		turnOn();
 		// act
 		fireShortClick();
+		waitForEndOfTimeout();
 		final int pwmValue = raspberryPiGatewayMock.getPwm();
 		// assert
 		assertThat(pwmValue, is(NO_LIGHT));
@@ -99,12 +116,26 @@ public class LightServerAcceptanceTest {
 	}
 
 	@Test
+	public void lightIsOn_twoShortClicks_turnsLightFullOn() {
+		// arrange
+		fireLongClick();
+		assertThat(raspberryPiGatewayMock.getPwm(), is(equalTo(ONE_STEP_DOWN)));
+		// act
+		fireShortClick();
+		fireShortClick();
+		final int pwmValue = raspberryPiGatewayMock.getPwm();
+		// assert
+		assertThat(pwmValue, is(FULL_LIGHT));
+	}
+
+	@Test
 	public void lightIsOnAndDimed_turnOffAndOn_dimedStateIsRestored() {
 		// arrange
 		turnOn();
 		fireLongClick();
 		assertThat(raspberryPiGatewayMock.getPwm(), is(equalTo(ONE_STEP_DOWN)));
 		fireShortClick();
+		waitForEndOfTimeout();
 		assumeThat(raspberryPiGatewayMock.getPwm(), is(equalTo(NO_LIGHT)));
 		// act
 		fireShortClick();
@@ -159,7 +190,7 @@ public class LightServerAcceptanceTest {
 		}
 	}
 
-	public void onLightStateInputEvent(@Observes final LightStateInputEvent event) {
+	public void onLightStateInputEvent(@Observes(during = TransactionPhase.AFTER_SUCCESS) final LightStateInputEvent event) {
 		if (event.equals(LightStateInputEvent.createTimeoutEvent())) {
 			timeout.release();
 		}

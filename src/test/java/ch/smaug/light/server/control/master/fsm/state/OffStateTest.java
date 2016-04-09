@@ -46,7 +46,6 @@ public class OffStateTest extends AbstractStateTest<OffState> {
 		// act
 		testee.onEnter();
 		// assert
-		verify(masterLightControl).turnOff();
 		verify(keyLock).releaseLock();
 	}
 

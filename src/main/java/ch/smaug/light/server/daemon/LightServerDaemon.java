@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import ch.smaug.light.server.pi.RaspberryPiGatewayImpl;
+import ch.smaug.light.server.control.master.fsm.machine.LightStateEventMachine;
 import ch.smaug.light.server.rest.RestServer;
 
 public class LightServerDaemon implements Daemon {
@@ -28,7 +28,7 @@ public class LightServerDaemon implements Daemon {
 	public void start() {
 		LOG.info("Starting daemon");
 		restServer.start();
-		CDI.current().select(RaspberryPiGatewayImpl.class).get().setPwm(0); // TODO Nicer implementation
+		CDI.current().select(LightStateEventMachine.class).get().initialize();
 	}
 
 	@Override

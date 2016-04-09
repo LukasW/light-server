@@ -67,6 +67,7 @@ public class LightStateEventMachineIntegrationTest {
 		// Act
 		testee.processEvent(LightStateInputEvent.createPositiveEdgeEvent("K1"));
 		testee.processEvent(LightStateInputEvent.createNegativeEdgeEvent("K1"));
+		testee.processEvent(LightStateInputEvent.createTimeoutEvent());
 		// Assert
 		verify(masterLightControl).turnOff();
 	}

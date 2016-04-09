@@ -12,14 +12,14 @@ public class StoppingState extends AbstractState {
 	private DimState dimState;
 
 	@Inject
-	private OffState offState;
+	private PreOffState preOffState;
 
 	@Override
 	public AbstractState process(final LightStateInputEvent event) {
 		AbstractState nextState;
 		switch (event.getType()) {
 		case NegativeEdge:
-			nextState = offState;
+			nextState = preOffState;
 			break;
 		case Timeout:
 			nextState = dimState;

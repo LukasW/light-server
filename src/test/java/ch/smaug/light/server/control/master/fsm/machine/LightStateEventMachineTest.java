@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import ch.smaug.light.server.control.master.MasterLightControl;
 import ch.smaug.light.server.control.master.fsm.event.LightStateInputEvent;
 import ch.smaug.light.server.control.master.fsm.state.AbstractState;
 
@@ -23,6 +24,9 @@ public class LightStateEventMachineTest {
 
 	@Mock
 	private AbstractState endingState;
+
+	@Mock
+	private MasterLightControl masterLightControl;
 
 	@Test
 	public void processEvent_callbackMethodsAreCalled() {
@@ -47,5 +51,14 @@ public class LightStateEventMachineTest {
 		verify(startingState).exit();
 		verify(startingState).process(LightStateInputEvent.createNegativeEdgeEvent("Key1"));
 		verify(startingState).enter();
+	}
+
+	@Test
+	public void initialize_turnsLightOff() {
+		// arrange
+		// act
+		testee.initialize();
+		// assert
+		verify(masterLightControl).turnOff();
 	}
 }
