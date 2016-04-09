@@ -30,8 +30,13 @@ import ch.smaug.light.server.pi.RaspberryPiGatewayMock;
 @ActivatedAlternatives(RaspberryPiGatewayMock.class)
 public class LightServerAcceptanceTest {
 
-	private static final int ONE_DIM_STEP_DOWN = 933;
-	private static final int TWO_DIM_STEPS_DOWN = 871;
+	private static final int NO_LIGHT = 0;
+
+	private static final int TWO_STEPS_DOWN = 871;
+
+	private static final int ONE_STEP_DOWN = 933;
+
+	private static final int FULL_LIGHT = 1000;
 
 	@Inject
 	private Event<KeyButtonEvent> keyButtonEvent;
@@ -48,21 +53,7 @@ public class LightServerAcceptanceTest {
 		final int pwmValue = raspberryPiGatewayMock.getPwm();
 		waitForEndOfTimeout();
 		// assert
-		assertThat(pwmValue, is(1000));
-	}
-
-	@Test
-	public void lightIsOff_twoShortClick_turnsLightMaxOn() {
-		// arrange
-		fireShortClick();
-		fireLongClick();
-		assumeThat(raspberryPiGatewayMock.getPwm(), is(equalTo(ONE_DIM_STEP_DOWN)));
-		// act
-		fireShortClick();
-		final int pwmValue = raspberryPiGatewayMock.getPwm();
-		waitForEndOfTimeout();
-		// assert
-		assertThat(pwmValue, is(1000));
+		assertThat(pwmValue, is(FULL_LIGHT));
 	}
 
 	@Test
@@ -72,18 +63,17 @@ public class LightServerAcceptanceTest {
 		fireLongClick();
 		final int pwmValue = raspberryPiGatewayMock.getPwm();
 		// assert
-		assertThat(pwmValue, is(equalTo(ONE_DIM_STEP_DOWN)));
+		assertThat(pwmValue, is(equalTo(ONE_STEP_DOWN)));
 	}
 
 	@Test
-	@Inject
 	public void lightIsOff_oneTwiceLongClick_turnsLightOnAndDimsTwoStepsDown() {
 		// arrange
 		// act
 		fireLongClick(2);
 		final int pwmValue = raspberryPiGatewayMock.getPwm();
 		// assert
-		assertThat(pwmValue, is(equalTo(TWO_DIM_STEPS_DOWN)));
+		assertThat(pwmValue, is(equalTo(TWO_STEPS_DOWN)));
 	}
 
 	@Test
@@ -94,7 +84,7 @@ public class LightServerAcceptanceTest {
 		fireShortClick();
 		final int pwmValue = raspberryPiGatewayMock.getPwm();
 		// assert
-		assertThat(pwmValue, is(0));
+		assertThat(pwmValue, is(NO_LIGHT));
 	}
 
 	@Test
@@ -105,7 +95,7 @@ public class LightServerAcceptanceTest {
 		fireLongClick();
 		final int pwmValue = raspberryPiGatewayMock.getPwm();
 		// assert
-		assertThat(pwmValue, is(equalTo(ONE_DIM_STEP_DOWN)));
+		assertThat(pwmValue, is(equalTo(ONE_STEP_DOWN)));
 	}
 
 	@Test
@@ -113,15 +103,15 @@ public class LightServerAcceptanceTest {
 		// arrange
 		turnOn();
 		fireLongClick();
-		assertThat(raspberryPiGatewayMock.getPwm(), is(equalTo(933)));
+		assertThat(raspberryPiGatewayMock.getPwm(), is(equalTo(ONE_STEP_DOWN)));
 		fireShortClick();
-		assumeThat(raspberryPiGatewayMock.getPwm(), is(equalTo(0)));
+		assumeThat(raspberryPiGatewayMock.getPwm(), is(equalTo(NO_LIGHT)));
 		// act
 		fireShortClick();
 		waitForEndOfTimeout();
 		final int pwmValue = raspberryPiGatewayMock.getPwm();
 		// assert
-		assertThat(pwmValue, is(equalTo(ONE_DIM_STEP_DOWN)));
+		assertThat(pwmValue, is(equalTo(ONE_STEP_DOWN)));
 	}
 
 	@Test
@@ -134,12 +124,12 @@ public class LightServerAcceptanceTest {
 		waitForEndOfTimeout();
 		keyButtonEvent.fire(new KeyButtonEvent(Key.Key1, Edge.Negative));
 		// assert
-		assertThat(raspberryPiGatewayMock.getPwm(), is(equalTo(ONE_DIM_STEP_DOWN)));
+		assertThat(raspberryPiGatewayMock.getPwm(), is(equalTo(ONE_STEP_DOWN)));
 	}
 
 	private void turnOn() {
 		fireShortClick();
-		assumeThat(raspberryPiGatewayMock.getPwm(), is(1000));
+		assumeThat(raspberryPiGatewayMock.getPwm(), is(FULL_LIGHT));
 		waitForEndOfTimeout();
 	}
 
@@ -150,7 +140,7 @@ public class LightServerAcceptanceTest {
 
 	private void fireLongClick(final int timeouts) {
 		keyButtonEvent.fire(new KeyButtonEvent(Key.Key1, Edge.Positive));
-		for (int i = 0; i < timeouts; i++) {
+		for (int i = NO_LIGHT; i < timeouts; i++) {
 			waitForEndOfTimeout();
 		}
 		keyButtonEvent.fire(new KeyButtonEvent(Key.Key1, Edge.Negative));
