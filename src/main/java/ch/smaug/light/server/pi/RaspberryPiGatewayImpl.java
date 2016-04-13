@@ -73,6 +73,10 @@ public class RaspberryPiGatewayImpl implements RaspberryPiGateway {
 		if (value < 0 || value > PWM_RANGE) {
 			throw new IllegalArgumentException(String.format("value must be in in [0..%d]", PWM_RANGE));
 		}
-		pwmOutput.setPwm(value);
+		pwmOutput.setPwm(invertValue(value));
+	}
+
+	private int invertValue(final int value) {
+		return PWM_RANGE - value;
 	}
 }
